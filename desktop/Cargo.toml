@@ -45,4 +45,4 @@ thiserror = "1"
 cargo-llvm-cov = "0.6"
 
 [build-dependencies]
-tauri-build = "2"
+tauri-build = { version = "2", features = [] }

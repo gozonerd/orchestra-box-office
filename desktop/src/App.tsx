@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "./hooks/useDatabase";
-import { PipelineList, Dashboard } from "./components";
+import { PipelineList, Dashboard, RunsPage } from "./components";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -58,15 +58,6 @@ const App: React.FC = () => {
 };
 
 // Placeholder pages
-const RunsPage: React.FC = () => (
-  <div>
-    <h2 className="text-3xl font-bold text-gray-900 mb-6">Pipeline Runs</h2>
-    <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-gray-600">Pipeline runs will be displayed here</p>
-    </div>
-  </div>
-);
-
 const BudgetsPage: React.FC = () => (
   <div>
     <h2 className="text-3xl font-bold text-gray-900 mb-6">Budget Tracking</h2>
