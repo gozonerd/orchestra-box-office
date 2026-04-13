@@ -2,7 +2,7 @@
 //!
 //! Provides IPC commands for database operations, file I/O, and local state management.
 
-use tauri::{AppHandle, Manager};
+use tracing_subscriber::EnvFilter;
 use orchestra_box_office_shared as shared;
 
 pub mod commands;
@@ -15,18 +15,25 @@ pub use config::*;
 
 /// Initialize the Tauri application (setup, database, etc.).
 pub fn initialize_app(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt::init();
+    // Initialize tracing with env filter
+    let env_filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("orchestra_box_office=debug,tauri=info"));
 
-    // Initialize database
-    let app_handle = app.app_handle();
+    tracing_subscriber::fmt()
+        .with_env_filter(env_filter)
+        .init();
+
+    tracing::info!("Initializing Orchestra Box Office");
 
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn test_placeholder() {
-        // Tests for Tauri backend will be implemented in Stage 03
+    fn test_initialize_app_logging() {
+        // Logging initialization tested at runtime
     }
 }

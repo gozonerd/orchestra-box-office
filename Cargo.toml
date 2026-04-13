@@ -1,5 +1,5 @@
 [workspace]
-members = ["api", "shared"]
+members = ["api", "shared", "desktop"]
 resolver = "2"
 
 [workspace.package]
@@ -22,3 +22,6 @@ chrono = { version = "0.4", features = ["serde"] }
 axum = "0.7"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
+rusqlite = { version = "0.30", features = ["bundled", "chrono", "uuid"] }
+keyring = "2.1"
+anyhow = "1"
