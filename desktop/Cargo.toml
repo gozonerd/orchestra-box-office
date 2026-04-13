@@ -1,0 +1,47 @@
+[package]
+name = "orchestra-box-office"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "orchestra_box_office_lib"
+path = "src-tauri/lib.rs"
+
+[[bin]]
+name = "orchestra-box-office"
+path = "src-tauri/main.rs"
+
+[dependencies]
+orchestra-box-office-shared = { path = "../shared" }
+
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+rust_decimal = { workspace = true }
+
+# Tauri essentials
+tauri = { version = "2", features = ["shell-open", "window-all", "dialog-all"] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+tauri-plugin-store = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-http = "2"
+tauri-plugin-shell = "2"
+
+# Encryption and security
+sqlcipher = { version = "0.28", features = ["bundled-sqlcipher-vendored"] }
+thiserror = "1"
+
+[dev-dependencies]
+cargo-llvm-cov = "0.6"
+
+[build-dependencies]
+tauri-build = "2"

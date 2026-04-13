@@ -1,0 +1,14 @@
+# Clippy configuration for Orchestra Box Office
+
+# Allow some lints that might be useful in this context
+allow-expect-in-tests = true
+allow-unwrap-in-tests = true
+
+# Enforce stricter checks
+too-many-arguments-threshold = 7
+type-complexity-threshold = 500
+cognitive-complexity-threshold = 20
+single-char-binding-names-threshold = 4
+
+# Configured lints (treat as errors in CI)
+# See: https://rust-lang.github.io/rust-clippy/master/index.html

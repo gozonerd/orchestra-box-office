@@ -1,0 +1,89 @@
+name: Desktop CI/CD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --all --all-features
+      - run: cargo clippy --all-targets --all-features -- -D warnings
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run -w desktop test
+      - run: npm run -w desktop lint
+
+  build-windows:
+    runs-on: windows-latest
+    needs: test-and-lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run -w desktop tauri:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-windows
+          path: target/release/bundle/msi/
+
+  build-macos:
+    runs-on: macos-latest
+    needs: test-and-lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run -w desktop tauri:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-macos
+          path: target/release/bundle/dmg/
+
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: test-and-lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run -w desktop tauri:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-linux
+          path: target/release/bundle/deb/
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: test-and-lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+      - uses: rustsec/audit-check-action@v1

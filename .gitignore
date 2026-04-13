@@ -1,0 +1,50 @@
+# Rust
+target/
+Cargo.lock
+*.pdb
+
+# Node
+node_modules/
+dist/
+.env.local
+.env.*.local
+
+# Desktop
+/src-tauri/target/
+/desktop/target/
+*.db
+*.db-journal
+*.db-wal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Logs
+*.log
+logs/
+
+# Dev/Test
+.coverage/
+htmlcov/
+.tox/
+pytest_cache/
+
+# Secrets (never commit)
+.env
+.env.local
+*.key
+*.pem
