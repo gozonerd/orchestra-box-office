@@ -4,3 +4,4 @@ export { ErrorBanner } from "./ErrorBanner";
 export { PipelineList } from "./PipelineList";
 export { Dashboard } from "./Dashboard";
 export { RunsPage } from "./RunsPage";
+export { SyncPanel } from "./SyncPanel";

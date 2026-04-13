@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "./hooks/useDatabase";
-import { PipelineList, Dashboard, RunsPage } from "./components";
+import { PipelineList, Dashboard, RunsPage, SyncPanel } from "./components";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -53,6 +53,9 @@ const App: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* Sync Panel */}
+      <SyncPanel />
     </div>
   );
 };
