@@ -258,6 +258,30 @@ impl DbConnection {
         Ok(runs)
     }
 
+    /// List all pipeline runs across all pipelines.
+    pub fn list_all_pipeline_runs(&self) -> Result<Vec<(String, String, String, i64, Option<i64>, u32)>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, pipeline_id, status, started_at, ended_at, outcomes_count
+             FROM pipeline_runs
+             ORDER BY started_at DESC",
+        )?;
+
+        let runs = stmt
+            .query_map([], |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, i64>(3)?,
+                    row.get::<_, Option<i64>>(4)?,
+                    row.get::<_, u32>(5)?,
+                ))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(runs)
+    }
+
     /// Update pipeline run status.
     pub fn update_pipeline_run_status(&self, id: &str, status: &str) -> Result<()> {
         let now = Utc::now().timestamp();
@@ -352,6 +376,29 @@ impl DbConnection {
 
         let budgets = stmt
             .query_map(params![pipeline_id], |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, i64>(3)?,
+                    row.get::<_, i64>(4)?,
+                ))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(budgets)
+    }
+
+    /// List all budgets across all pipelines.
+    pub fn list_all_budgets(&self) -> Result<Vec<(String, String, String, i64, i64)>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, pipeline_id, period, allocated_cents, spent_cents
+             FROM budgets
+             ORDER BY period DESC",
+        )?;
+
+        let budgets = stmt
+            .query_map([], |row| {
                 Ok((
                     row.get::<_, String>(0)?,
                     row.get::<_, String>(1)?,

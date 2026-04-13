@@ -173,6 +173,18 @@ export const useDatabase = () => {
     []
   );
 
+  const listAllPipelineRuns = useCallback(async (): Promise<PipelineRun[]> => {
+    try {
+      const result = await invoke<PipelineRun[]>("list_all_pipeline_runs");
+      setError(null);
+      return result;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Failed to list all runs: ${msg}`);
+      return [];
+    }
+  }, []);
+
   const updatePipelineRunStatus = useCallback(
     async (id: string, status: string): Promise<boolean> => {
       try {
@@ -256,6 +268,18 @@ export const useDatabase = () => {
     []
   );
 
+  const listAllBudgets = useCallback(async (): Promise<Budget[]> => {
+    try {
+      const result = await invoke<Budget[]>("list_all_budgets");
+      setError(null);
+      return result;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Failed to list all budgets: ${msg}`);
+      return [];
+    }
+  }, []);
+
   const updateBudget = useCallback(
     async (id: string, spent_cents: number): Promise<boolean> => {
       try {
@@ -310,12 +334,14 @@ export const useDatabase = () => {
     createPipelineRun,
     getPipelineRun,
     listPipelineRuns,
+    listAllPipelineRuns,
     updatePipelineRunStatus,
     completePipelineRun,
     // Budgets
     createBudget,
     getBudget,
     listBudgets,
+    listAllBudgets,
     updateBudget,
     deleteBudget,
     // Sync

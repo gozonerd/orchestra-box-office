@@ -7,7 +7,6 @@
     "desktop"
   ],
   "scripts": {
-    "install": "npm install && npm install -w desktop",
     "dev": "npm run -w desktop tauri:dev",
     "build": "npm run -w desktop tauri:build",
     "lint:all": "npm run -w desktop lint && cargo clippy --all-targets --all-features",

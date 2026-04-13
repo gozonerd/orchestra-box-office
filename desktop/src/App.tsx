@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "./hooks/useDatabase";
-import { PipelineList } from "./components/PipelineList";
+import { PipelineList, Dashboard } from "./components";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -37,7 +37,7 @@ const App: React.FC = () => {
         <main className="flex-1 overflow-auto">
           {appReady ? (
             <div className="p-8">
-              {currentPage === "dashboard" && <DashboardPage />}
+              {currentPage === "dashboard" && <Dashboard />}
               {currentPage === "pipelines" && <PipelineList />}
               {currentPage === "runs" && <RunsPage />}
               {currentPage === "budgets" && <BudgetsPage />}
@@ -58,26 +58,6 @@ const App: React.FC = () => {
 };
 
 // Placeholder pages
-const DashboardPage: React.FC = () => (
-  <div>
-    <h2 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h2>
-    <div className="grid grid-cols-3 gap-4">
-      <div className="bg-white p-6 rounded-lg shadow">
-        <p className="text-gray-600 text-sm">Total Pipelines</p>
-        <p className="text-3xl font-bold text-gray-900">-</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow">
-        <p className="text-gray-600 text-sm">Active Runs</p>
-        <p className="text-3xl font-bold text-gray-900">-</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow">
-        <p className="text-gray-600 text-sm">Budget Utilization</p>
-        <p className="text-3xl font-bold text-gray-900">-</p>
-      </div>
-    </div>
-  </div>
-);
-
 const RunsPage: React.FC = () => (
   <div>
     <h2 className="text-3xl font-bold text-gray-900 mb-6">Pipeline Runs</h2>

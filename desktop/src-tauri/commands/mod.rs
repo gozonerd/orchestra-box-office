@@ -211,6 +211,32 @@ pub fn list_pipeline_runs(
         .collect())
 }
 
+/// List all pipeline runs across all pipelines.
+#[tauri::command]
+pub fn list_all_pipeline_runs(
+    db_state: State<DbState>,
+) -> Result<Vec<PipelineRunResponse>, String> {
+    let db_guard = db_state.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let db = db_guard.as_ref().ok_or("Database not initialized")?;
+
+    let runs = db.list_all_pipeline_runs()
+        .map_err(|e| format!("Failed to list all runs: {}", e))?;
+
+    Ok(runs
+        .into_iter()
+        .map(|(id, pipeline_id, status, started_at, ended_at, outcomes_count)| {
+            PipelineRunResponse {
+                id,
+                pipeline_id,
+                status,
+                started_at,
+                ended_at,
+                outcomes_count,
+            }
+        })
+        .collect())
+}
+
 /// Update a pipeline run status.
 #[tauri::command]
 pub fn update_pipeline_run_status(
@@ -298,6 +324,31 @@ pub fn list_budgets(
 
     let budgets = db.list_budgets(&pipeline_id)
         .map_err(|e| format!("Failed to list budgets: {}", e))?;
+
+    Ok(budgets
+        .into_iter()
+        .map(|(id, pipeline_id, period, allocated_cents, spent_cents)| {
+            BudgetResponse {
+                id,
+                pipeline_id,
+                period,
+                allocated_cents,
+                spent_cents,
+            }
+        })
+        .collect())
+}
+
+/// List all budgets across all pipelines.
+#[tauri::command]
+pub fn list_all_budgets(
+    db_state: State<DbState>,
+) -> Result<Vec<BudgetResponse>, String> {
+    let db_guard = db_state.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let db = db_guard.as_ref().ok_or("Database not initialized")?;
+
+    let budgets = db.list_all_budgets()
+        .map_err(|e| format!("Failed to list all budgets: {}", e))?;
 
     Ok(budgets
         .into_iter()
