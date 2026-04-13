@@ -5,7 +5,6 @@
 
 use anyhow::{anyhow, Result};
 use chrono::Utc;
-use orchestra_box_office_shared::models::*;
 use rusqlite::{params, Connection, OptionalExtension};
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
@@ -13,7 +12,7 @@ use uuid::Uuid;
 /// Database connection manager with encryption support.
 pub struct DbConnection {
     conn: Connection,
-    db_path: PathBuf,
+    _db_path: PathBuf,
 }
 
 impl DbConnection {
@@ -42,7 +41,7 @@ impl DbConnection {
              PRAGMA foreign_keys = ON;",
         )?;
 
-        Ok(DbConnection { conn, db_path })
+        Ok(DbConnection { conn, _db_path: db_path })
     }
 
     /// Initialize the database schema if it doesn't exist.
