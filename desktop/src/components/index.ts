@@ -5,3 +5,4 @@ export { PipelineList } from "./PipelineList";
 export { Dashboard } from "./Dashboard";
 export { RunsPage } from "./RunsPage";
 export { SyncPanel } from "./SyncPanel";
+export { BudgetPage } from "./BudgetPage";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "./hooks/useDatabase";
-import { PipelineList, Dashboard, RunsPage, SyncPanel } from "./components";
+import { PipelineList, Dashboard, RunsPage, SyncPanel, BudgetPage } from "./components";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -40,7 +40,7 @@ const App: React.FC = () => {
               {currentPage === "dashboard" && <Dashboard />}
               {currentPage === "pipelines" && <PipelineList />}
               {currentPage === "runs" && <RunsPage />}
-              {currentPage === "budgets" && <BudgetsPage />}
+              {currentPage === "budgets" && <BudgetPage />}
               {currentPage === "settings" && <SettingsPage />}
             </div>
           ) : (
@@ -61,15 +61,6 @@ const App: React.FC = () => {
 };
 
 // Placeholder pages
-const BudgetsPage: React.FC = () => (
-  <div>
-    <h2 className="text-3xl font-bold text-gray-900 mb-6">Budget Tracking</h2>
-    <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-gray-600">Budget information will be displayed here</p>
-    </div>
-  </div>
-);
-
 const SettingsPage: React.FC = () => (
   <div>
     <h2 className="text-3xl font-bold text-gray-900 mb-6">Settings</h2>
