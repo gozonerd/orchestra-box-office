@@ -13,5 +13,7 @@
     "format:all": "npm run -w desktop format && cargo fmt --all",
     "test:all": "npm run -w desktop test && cargo test --all"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "@tauri-apps/api": "^2.10.1"
+  }
 }
