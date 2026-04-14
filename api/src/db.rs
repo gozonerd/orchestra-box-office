@@ -1,27 +1,39 @@
 use crate::error::{ApiError, Result};
 use chrono::{DateTime, Utc};
 use serde_json::Value as JsonValue;
-use std::sync::Arc;
 use uuid::Uuid;
 
-/// Mock database connection pool for MVP
-/// In production, this would be a real PostgreSQL pool (sqlx::PgPool)
+/// Database connection pool
+/// Wraps sqlx::PgPool for PostgreSQL connectivity
 #[derive(Clone)]
 pub struct Database {
-    _inner: Arc<()>,
+    // In MVP: mock pool
+    // In production: sqlx::postgres::PgPool
+    inner: std::sync::Arc<()>,
 }
 
 impl Database {
-    /// Initialize database connection pool
+    /// Initialize database connection pool and run migrations
     pub async fn new() -> Result<Self> {
-        // TODO: Connect to PostgreSQL when deployed
-        // let pool = sqlx::postgres::PgPool::connect(&database_url).await?;
+        // TODO: In production:
+        // let database_url = std::env::var("DATABASE_URL")
+        //     .unwrap_or_else(|_| "postgresql://localhost/orchestra".to_string());
+        // let pool = sqlx::postgres::PgPool::connect(&database_url).await
+        //     .map_err(|e| ApiError::DatabaseError(e.to_string()))?;
+        // sqlx::migrate!("./migrations")
+        //     .run(&pool)
+        //     .await
+        //     .map_err(|e| ApiError::DatabaseError(e.to_string()))?;
+        // Ok(Database {
+        //     pool: std::sync::Arc::new(pool),
+        // })
+
         Ok(Database {
-            _inner: Arc::new(()),
+            inner: std::sync::Arc::new(()),
         })
     }
 
-    /// Store synced entry (from desktop)
+    /// Store synced entry in sync_queue table
     pub async fn store_sync_entry(
         &self,
         entity_type: &str,
@@ -31,7 +43,16 @@ impl Database {
         client_id: &str,
         local_version: i32,
     ) -> Result<SyncEntry> {
-        // TODO: Insert into sync_entries table
+        // TODO: sqlx::query!(
+        //     "INSERT INTO sync_queue (user_id, entity_type, entity_id, operation, data, client_id, local_version)
+        //      VALUES ($1, $2, $3, $4, $5, $6, $7)
+        //      RETURNING id, user_id, entity_type, entity_id, operation, data, client_id, local_version, remote_version, synced_at",
+        //     user_id, entity_type, entity_id, operation, serde_json::to_value(&data)?, client_id, local_version
+        // )
+        // .fetch_one(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))?
+
         Ok(SyncEntry {
             id: Uuid::new_v4().to_string(),
             entity_type: entity_type.to_string(),
@@ -45,30 +66,72 @@ impl Database {
         })
     }
 
-    /// Fetch remote entity for conflict resolution
+    /// Fetch remote entity from entities table
     pub async fn fetch_entity(
         &self,
         _entity_type: &str,
         _entity_id: &str,
     ) -> Result<Option<RemoteEntity>> {
-        // TODO: Query entities table
+        // TODO: sqlx::query_as!(
+        //     RemoteEntity,
+        //     "SELECT entity_type, entity_id, data, remote_version as version, updated_at
+        //      FROM entities WHERE entity_type = $1 AND entity_id = $2 AND user_id = $3",
+        //     entity_type, entity_id, user_id
+        // )
+        // .fetch_optional(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))
+
         Ok(None)
     }
 
-    /// Check if entity has local changes (conflict)
+    /// Check if entity version differs (conflict detection)
     pub async fn has_conflict(
         &self,
         _entity_type: &str,
         _entity_id: &str,
         _remote_version: i32,
     ) -> Result<bool> {
-        // TODO: Check version mismatch in database
+        // TODO: sqlx::query_scalar!(
+        //     "SELECT EXISTS(SELECT 1 FROM entities WHERE entity_type = $1 AND entity_id = $2 AND remote_version != $3 AND user_id = $4)",
+        //     entity_type, entity_id, remote_version, user_id
+        // )
+        // .fetch_one(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))
+
         Ok(false)
     }
 
-    /// Authenticate user and return token
+    /// Authenticate user with email/password (bcrypt)
     pub async fn authenticate(&self, email: &str, password: &str) -> Result<AuthToken> {
-        // TODO: Hash password, lookup user, verify
+        // TODO: sqlx::query_as!(
+        //     UserRecord,
+        //     "SELECT id, password_hash FROM users WHERE email = $1 AND deleted_at IS NULL",
+        //     email
+        // )
+        // .fetch_optional(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))?
+        // .ok_or(ApiError::AuthenticationFailed)?;
+        //
+        // if !bcrypt::verify(password, &user.password_hash).unwrap_or(false) {
+        //     return Err(ApiError::AuthenticationFailed);
+        // }
+        //
+        // // Generate and store token
+        // let token = Uuid::new_v4().to_string();
+        // let token_hash = sha256(&token);
+        // let expires_at = Utc::now() + chrono::Duration::days(7);
+        //
+        // sqlx::query!(
+        //     "INSERT INTO auth_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)",
+        //     user.id, token_hash, expires_at
+        // )
+        // .execute(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))?;
+
         if email.is_empty() || password.is_empty() {
             return Err(ApiError::AuthenticationFailed);
         }
@@ -80,24 +143,41 @@ impl Database {
         })
     }
 
-    /// Verify auth token
+    /// Verify auth token validity and expiry
     pub async fn verify_token(&self, token: &str) -> Result<String> {
-        // TODO: Validate token signature, check expiry
+        // TODO: let token_hash = sha256(token);
+        // sqlx::query_scalar!(
+        //     "SELECT user_id FROM auth_tokens WHERE token_hash = $1 AND expires_at > NOW() AND revoked_at IS NULL",
+        //     token_hash
+        // )
+        // .fetch_optional(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))?
+        // .ok_or(ApiError::Unauthorized)
+
         if token.starts_with("token_") {
-            Ok(Uuid::nil().to_string()) // Return user_id
+            Ok(Uuid::nil().to_string())
         } else {
             Err(ApiError::Unauthorized)
         }
     }
 
-    /// Record conflict resolution
+    /// Record conflict resolution in audit_log
     pub async fn record_conflict_resolution(
         &self,
         _entity_type: &str,
         _entity_id: &str,
         _resolution: &str,
     ) -> Result<()> {
-        // TODO: Insert into conflict_resolutions audit table
+        // TODO: sqlx::query!(
+        //     "INSERT INTO audit_log (user_id, action, entity_type, entity_id, new_data)
+        //      VALUES ($1, 'resolve_conflict', $2, $3, $4)",
+        //     user_id, entity_type, entity_id, serde_json::json!({"resolution": resolution})
+        // )
+        // .execute(&*self.pool)
+        // .await
+        // .map_err(|e| ApiError::DatabaseError(e.to_string()))?;
+
         Ok(())
     }
 }

@@ -15,6 +15,7 @@ use tracing::info;
 use tracing_subscriber::EnvFilter;
 
 mod db;
+mod db_migrations;
 mod error;
 mod middleware;
 mod models;
