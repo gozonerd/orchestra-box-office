@@ -1,0 +1,197 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                 ORCHESTRA BOX OFFICE — LAUNCH DAY QUICK REFERENCE             ║
+║                            April 20, 2026                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+LAUNCH TIME: 10:00 AM EDT
+TIMEZONE: All times in EDT unless specified
+BACKUP: [TBD contact]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T-6 HOURS (4:00 AM EDT) — PRE-LAUNCH HEALTH CHECKS
+
+  [ ] Check API health:  curl https://api.orchestraboxoffice.com/health
+  [ ] Check logs:        flyctl logs -a orchestra-box-office --level error
+  [ ] Check database:    flyctl postgres status  (or Neon dashboard)
+  [ ] Send team alert:   "Launch in 6 hours. Systems nominal. Standby."
+  [ ] Open dashboards:   Fly.io, Monitoring, GitHub Actions
+
+  Expected Response for Health Check:
+    HTTP 200 OK
+    {"status":"ok","timestamp":"...","version":"1.0.0"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T-2 HOURS (8:00 AM EDT) — FINAL VERIFICATION
+
+  Desktop Smoke Test:
+    [ ] Windows: Install & launch, verify sync status
+    [ ] macOS:   Install & launch, verify sync status
+    [ ] Linux:   Install & launch, verify sync status
+
+  API Smoke Test:
+    [ ] Authentication: Test login flow
+    [ ] Sync:          Test batch sync endpoint
+    [ ] Update:        Test manifest is latest
+
+  All Green? → Proceed to launch
+  Any Red?  → Contact engineering, troubleshoot
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T-30 MIN (9:30 AM EDT) — FINAL CHECKLIST
+
+  [ ] Monitoring dashboards open
+  [ ] Support email monitored
+  [ ] Social media scheduled & ready to post
+  [ ] Beta tester email drafted
+  [ ] All team members at their stations
+  [ ] Escalation contacts confirmed
+  [ ] Rollback procedure documented
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T-0 (10:00 AM EDT) — GO LIVE!
+
+  1. POST TO SOCIAL MEDIA (2 min)
+     [ ] Twitter/X announcement
+     [ ] LinkedIn post
+     [ ] Discord announcement
+
+  2. SEND BETA TESTER EMAIL (2 min)
+     [ ] Thank you email sent
+     [ ] Download link in email body
+
+  3. UPDATE STATUS PAGES (1 min)
+     [ ] GitHub Release published
+     [ ] Status: "Live"
+
+  4. MONITOR (Start watching metrics immediately)
+     [ ] Download count
+     [ ] API error rate
+     [ ] Support emails
+     [ ] System performance
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T+30 MIN (10:30 AM EDT)
+
+  [ ] Check downloads: gh release view v1.0.0 --json assets
+  [ ] Verify no errors in API logs
+  [ ] Respond to any support questions
+  [ ] Share metrics snapshot in team chat
+
+  Target: 5-10 downloads already
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T+1 HOUR (11:00 AM EDT)
+
+  [ ] Check API metrics: flyctl monitor -a orchestra-box-office
+  [ ] Review error logs for any issues
+  [ ] Respond to user feedback on social media
+  [ ] Share status update: "Launch successful, X+ downloads"
+
+  Expected: Error rate <0.5%, response time <500ms
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T+4 HOURS (2:00 PM EDT)
+
+  [ ] Verify 100+ installations
+  [ ] Check support email for issues
+  [ ] Monitor crash reports
+  [ ] Verify sync data flowing to cloud
+
+  If any critical issue:
+    1. Page engineering immediately
+    2. Assess: Can we fix quickly or rollback?
+    3. Communicate ETA to users
+    4. Document incident
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+T+24 HOURS (10:00 AM EDT next day)
+
+  [ ] Review full metrics report
+  [ ] Publish launch recap blog post
+  [ ] Send thank-you message to community
+  [ ] Plan v1.0.1 hotfix if needed
+  [ ] Archive incident reports
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL CONTACTS
+
+  Engineering:   [TBD] — [email] — [phone]
+  DevOps:        [TBD] — [email] — [phone]
+  Product:       [TBD] — [email] — [phone]
+  Support:       support@orchestraboxoffice.com
+
+ESCALATION CHAIN
+  1. Ping on Slack/Discord
+  2. Call if no response in 5 min
+  3. Page on-call engineer
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+KEY METRICS TO WATCH
+
+  ✅ API Health:        Status: OK ✓
+  ✅ Database:          Connected ✓
+  ✅ Error Rate:        <0.5% ✓
+  ✅ Response Time:     <500ms (p95) ✓
+  ✅ Desktop Sync:      Working ✓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EMERGENCY PROCEDURES
+
+  API DOWN (503 / Connection refused)
+    1. Check: flyctl status
+    2. View: flyctl logs -a orchestra-box-office | head -50
+    3. Restart: flyctl machines restart
+    4. If still down: Rollback → flyctl releases rollback
+
+  DATABASE UNAVAILABLE (Connection timeout)
+    1. Check: Database provider status page
+    2. View: flyctl logs | grep database
+    3. Notify users: "Cloud sync temporarily unavailable"
+    4. Estimated fix time: [contact DevOps]
+
+  HIGH ERROR RATE (>5%)
+    1. Check: flyctl logs | grep -i error | head -20
+    2. Identify: Common error pattern
+    3. Deploy: Hotfix (v1.0.1) if critical
+    4. Or: Rollback to v0.9.9 if needed
+
+  ROLLBACK (If critical issue)
+    Command: flyctl releases rollback
+    Downtime: 2-5 minutes
+    Data loss: None
+    User impact: Cloud features disabled until v1.0.1 released
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SUCCESS CRITERIA
+
+  ✓ API responding to health checks (200 OK)
+  ✓ Zero critical errors in first 4 hours
+  ✓ 100+ downloads in first week
+  ✓ Desktop auth working on all platforms
+  ✓ Cloud sync functioning without data loss
+  ✓ Support team handling user questions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+THIS IS IT. WE'RE READY. LET'S LAUNCH! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Print this card. Keep it on your desk. Follow it step-by-step.
+Questions? Review LAUNCH_DAY_SCRIPT.md for details.
+
+Document: LAUNCH_DAY_QUICK_REFERENCE.txt
+Version: 1.0
+Date: 2026-04-15
