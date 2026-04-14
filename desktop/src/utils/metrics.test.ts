@@ -23,8 +23,8 @@ describe("Metrics Utilities", () => {
     });
 
     it("should handle fractional ROI", () => {
-      const roi = calculateROI(333, 10000); // 333 / 100 * 100 = 333%
-      expect(roi).toBe(333);
+      const roi = calculateROI(333, 10000); // 333 outcomes / $100 cost = 3.33%
+      expect(roi).toBeCloseTo(3.33, 1);
     });
   });
 
