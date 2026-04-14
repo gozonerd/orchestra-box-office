@@ -1,0 +1,84 @@
+name: Shared Checks
+
+on:
+  push:
+    branches: [master, develop]
+    paths:
+      - 'shared/**'
+      - 'Cargo.toml'
+      - '.github/workflows/shared-checks.yml'
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: Test Shared Library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: cargo test -p orchestra-box-office-shared
+
+  lint:
+    name: Lint Shared
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: swatinem/rust-cache@v2
+
+      - name: Run clippy
+        run: cargo clippy -p orchestra-box-office-shared -- -D warnings
+
+  format:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Check format
+        run: cargo fmt -- --check
+
+  security:
+    name: Workspace Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Run cargo-audit
+        uses: rustsec/audit-check-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for secrets with gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+
+      - name: Check docs
+        run: cargo doc --no-deps -p orchestra-box-office-shared
+        env:
+          RUSTDOCFLAGS: -D warnings

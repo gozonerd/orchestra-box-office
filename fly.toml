@@ -1,0 +1,38 @@
+# Fly.io configuration for Orchestra Box Office API
+app = "orchestra-box-office"
+primary_region = "ewr"
+
+[build]
+  dockerfile = "api/Dockerfile"
+  args = {}
+
+[env]
+  RUST_LOG = "orchestra_box_office_api=debug"
+  DATABASE_URL = "postgresql://"
+
+[[services]]
+  internal_port = 8080
+  processes = ["app"]
+
+  [services.http_checks]
+    enabled = true
+    grace_period = "5s"
+    interval = "30s"
+    min_timeout = "10s"
+    path = "/health"
+    timeout = "10s"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+[env]
+  MACHINES_ENABLED = "true"
+
+[processes]
+  app = "orchestra-box-office-api"

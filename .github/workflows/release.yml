@@ -1,0 +1,150 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ env.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: tag_name
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          draft: false
+          prerelease: ${{ contains(env.VERSION, 'alpha') || contains(env.VERSION, 'beta') }}
+
+  build-desktop:
+    name: Build Desktop Release
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: orchestra_*.AppImage
+            asset_name: orchestra-linux-x64.AppImage
+          - os: macos-latest
+            artifact_name: Orchestra_*.dmg
+            asset_name: orchestra-macos.dmg
+          - os: windows-latest
+            artifact_name: Orchestra_*.msi
+            asset_name: orchestra-windows-x64.msi
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./desktop
+
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev libwebkit2gtk-4.0-dev build-essential curl wget libappindicator3-dev patchelf
+
+      - name: Install Node dependencies
+        run: npm ci --workspace=desktop
+
+      - name: Build desktop
+        working-directory: desktop
+        run: npm run tauri:build
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./desktop/src-tauri/target/release/bundle/*/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream
+
+  deploy-api:
+    name: Deploy API Release
+    needs: create-release
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          VERSION: ${{ needs.create-release.outputs.version }}
+        run: |
+          cd api
+          flyctl deploy --remote-only --build-arg VERSION=$VERSION
+
+      - name: Health check
+        run: |
+          sleep 10
+          curl -f https://api.orchestraboxoffice.com/health || exit 1
+
+  update-manifest:
+    name: Update Auto-Update Manifest
+    needs: [create-release, build-desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update update.json for desktop auto-updates
+        env:
+          VERSION: ${{ needs.create-release.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > update.json <<EOF
+          {
+            "version": "$VERSION",
+            "notes": "Release $VERSION",
+            "pub_date": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+            "platforms": {
+              "linux-x86_64": {
+                "signature": "",
+                "url": "https://github.com/nerdykrystal/orchestra-box-office/releases/download/$VERSION/orchestra-linux-x64.AppImage"
+              },
+              "darwin-aarch64": {
+                "signature": "",
+                "url": "https://github.com/nerdykrystal/orchestra-box-office/releases/download/$VERSION/orchestra-macos.dmg"
+              },
+              "darwin-x86_64": {
+                "signature": "",
+                "url": "https://github.com/nerdykrystal/orchestra-box-office/releases/download/$VERSION/orchestra-macos.dmg"
+              },
+              "win32-x86_64": {
+                "signature": "",
+                "url": "https://github.com/nerdykrystal/orchestra-box-office/releases/download/$VERSION/orchestra-windows-x64.msi"
+              }
+            }
+          }
+          EOF
+
+      - name: Commit and push manifest
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add update.json
+          git commit -m "Update auto-update manifest for ${{ needs.create-release.outputs.version }}"
+          git push
