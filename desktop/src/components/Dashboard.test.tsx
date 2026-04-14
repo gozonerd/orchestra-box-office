@@ -8,7 +8,7 @@ vi.mock("../hooks/useDatabase", () => ({
     listPipelines: vi.fn().mockResolvedValue([
       { id: "p1", name: "Pipeline 1", description: "Test Pipeline" },
     ]),
-    listPipelineRuns: vi.fn().mockResolvedValue([
+    listAllPipelineRuns: vi.fn().mockResolvedValue([
       {
         id: "r1",
         pipeline_id: "p1",
@@ -17,7 +17,7 @@ vi.mock("../hooks/useDatabase", () => ({
         outcomes_count: 100,
       },
     ]),
-    listBudgets: vi.fn().mockResolvedValue([
+    listAllBudgets: vi.fn().mockResolvedValue([
       {
         id: "b1",
         pipeline_id: "p1",
