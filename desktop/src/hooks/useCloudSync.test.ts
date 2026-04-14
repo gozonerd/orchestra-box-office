@@ -3,7 +3,7 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { useCloudSync } from "./useCloudSync";
 
 // Mock tauri invoke
-vi.mock("@tauri-apps/api/tauri", () => ({
+vi.mock("@tauri-apps/api/core", () => ({
   invoke: vi.fn(),
 }));
 
@@ -60,7 +60,7 @@ describe("useCloudSync", () => {
     const { result } = renderHook(() => useCloudSync());
 
     // Mock failed auth
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     vi.mocked(invoke).mockRejectedValueOnce(new Error("Auth failed"));
 
     let authSuccess = false;
@@ -72,7 +72,7 @@ describe("useCloudSync", () => {
   });
 
   it("syncs pending entries when authenticated", async () => {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     vi.mocked(invoke).mockResolvedValueOnce(1); // pending count
     vi.mocked(invoke).mockResolvedValueOnce([
       {
@@ -102,7 +102,7 @@ describe("useCloudSync", () => {
   });
 
   it("tracks pending entry count", async () => {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     vi.mocked(invoke).mockResolvedValueOnce(3); // 3 pending entries
 
     const { result } = renderHook(() => useCloudSync());
@@ -163,7 +163,7 @@ describe("useCloudSync", () => {
   });
 
   it("handles sync errors gracefully", async () => {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     vi.mocked(invoke).mockRejectedValueOnce(new Error("Network error"));
 
     const { result } = renderHook(() => useCloudSync());
