@@ -1,50 +1,84 @@
 //! Orchestra Box Office Cloud API
 //!
-//! RESTful API for Box Office (Axum + PostgreSQL on Fly.io).
-//! Handles sync, conflict resolution, and financial data management.
+//! RESTful API for sync, authentication, and conflict resolution.
+//! Built with Axum + PostgreSQL for cloud deployment on Fly.io.
 
 use axum::{
+    extract::DefaultBodyLimit,
     routing::{get, post},
-    Router,
+    Json, Router,
 };
+use serde_json::json;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tracing::info;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_subscriber::EnvFilter;
 
-mod routes;
 mod db;
-mod middleware;
 mod error;
+mod middleware;
+mod models;
+mod routes;
 
-/// Application state (PostgreSQL pool, etc.).
+use crate::db::Database;
+
+/// Application state containing database pool
 #[derive(Clone)]
-pub struct AppState;
+pub struct AppState {
+    pub db: Database,
+}
 
 #[tokio::main]
 async fn main() {
     // Initialize tracing
-    let env_filter = EnvFilter::from_default_env();
+    let env_filter = EnvFilter::from_default_env()
+        .add_directive("orchestra_box_office_api=debug".parse().unwrap());
 
-    tracing_subscriber::registry()
-        .with(env_filter)
-        .with(tracing_subscriber::fmt::layer())
+    tracing_subscriber::fmt()
+        .with_env_filter(env_filter)
         .init();
 
     info!("Starting Orchestra Box Office API");
 
+    // Initialize database
+    let db = Database::new()
+        .await
+        .expect("Failed to initialize database");
+
+    let state = AppState { db };
+
     // Build router
     let app = Router::new()
+        // Health check
         .route("/health", get(health_check))
-        .route("/api/v1/pipelines", post(routes::create_pipeline))
-        .route("/api/v1/pipelines", get(routes::list_pipelines))
-        .with_state(AppState)
-        .layer(axum::middleware::from_fn(middleware::request_logging));
+        // Auth routes
+        .route("/api/v1/auth/login", post(routes::auth::login))
+        .route("/api/v1/auth/status", get(routes::auth::check_auth))
+        // Sync routes
+        .route("/api/v1/sync/batch", post(routes::sync::batch_sync))
+        .route(
+            "/api/v1/sync/entry/:entity_type",
+            post(routes::sync::upload_entry),
+        )
+        // Entity routes
+        .route(
+            "/api/v1/entities/:entity_type/:entity_id",
+            get(routes::entities::fetch_entity),
+        )
+        // Conflict resolution
+        .route(
+            "/api/v1/conflicts/resolve",
+            post(routes::conflicts::resolve_conflict),
+        )
+        .layer(DefaultBodyLimit::max(10 * 1024 * 1024)) // 10MB
+        .layer(axum::middleware::from_fn(middleware::request_logging))
+        .with_state(state);
 
-    // Listen on 0.0.0.0:3000 (Fly.io will proxy requests)
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    let listener = TcpListener::bind(&addr).await
-        .expect("Failed to bind to port 3000");
+    // Listen on 0.0.0.0:8080
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    let listener = TcpListener::bind(&addr)
+        .await
+        .expect("Failed to bind to port 8080");
 
     info!("Listening on {}", addr);
 
@@ -53,18 +87,21 @@ async fn main() {
         .expect("Server failed");
 }
 
-/// Health check endpoint.
-async fn health_check() -> &'static str {
-    "OK"
+/// Health check endpoint
+async fn health_check() -> impl axum::response::IntoResponse {
+    Json(json!({
+        "status": "ok",
+        "timestamp": chrono::Utc::now().to_rfc3339()
+    }))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_app_state_clone() {
-        let state = AppState;
-        let _cloned = state.clone();
+    #[tokio::test]
+    async fn test_health_check() {
+        // Test that health_check completes without panicking
+        let _ = health_check().await;
     }
 }
