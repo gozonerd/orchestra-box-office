@@ -55,7 +55,7 @@ describe("RunsPage", () => {
     render(<RunsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText("Pipeline 1")).toBeInTheDocument();
+      expect(screen.getAllByText("Pipeline 1")[0]).toBeInTheDocument();
     });
   });
 

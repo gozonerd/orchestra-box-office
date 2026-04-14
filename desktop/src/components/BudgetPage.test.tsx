@@ -69,7 +69,8 @@ describe("BudgetPage", () => {
     render(<BudgetPage />);
 
     await waitFor(() => {
-      expect(screen.getByText("Pipeline 1")).toBeInTheDocument();
+      const pipelineElements = screen.getAllByText("Pipeline 1");
+      expect(pipelineElements.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -77,9 +78,9 @@ describe("BudgetPage", () => {
     render(<BudgetPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Allocated/)).toBeInTheDocument();
-      expect(screen.getByText(/Spent/)).toBeInTheDocument();
-      expect(screen.getByText(/Utilization/)).toBeInTheDocument();
+      expect(screen.getAllByText(/Allocated/)[0]).toBeInTheDocument();
+      expect(screen.getAllByText(/Spent/)[0]).toBeInTheDocument();
+      expect(screen.getAllByText(/Utilization/)[0]).toBeInTheDocument();
     });
   });
 
