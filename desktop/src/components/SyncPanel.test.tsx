@@ -41,7 +41,11 @@ describe("SyncPanel", () => {
     render(<SyncPanel />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Last sync:/)).toBeInTheDocument();
+      // Text may be split across sibling DOM nodes; use textContent to find parent
+      const el = screen.getByText(
+        (_, element) => Boolean(element?.textContent?.match(/Last sync:/))
+      );
+      expect(el).toBeInTheDocument();
     });
   });
 
@@ -59,7 +63,7 @@ describe("SyncPanel", () => {
     expandButton.click();
 
     await waitFor(() => {
-      expect(screen.getByText(/Sync Now/)).toBeInTheDocument();
+      expect(screen.getAllByText(/Sync Now/)[0]).toBeInTheDocument();
     });
   });
 
@@ -81,7 +85,7 @@ describe("SyncPanel", () => {
     expandButton.click();
 
     await waitFor(() => {
-      const syncButton = screen.getByText(/Sync Now/);
+      const syncButton = screen.getAllByText(/Sync Now/)[0];
       expect(syncButton).toBeInTheDocument();
       expect(syncButton.closest("button")).not.toBeDisabled();
     });
