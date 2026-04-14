@@ -14,6 +14,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
+  const devItems = [
+    { id: "design-system", label: "Design System", icon: "🎨" },
+  ];
+
   return (
     <aside className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
       <nav className="p-6 space-y-2">
@@ -31,6 +35,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
             <span>{item.label}</span>
           </button>
         ))}
+
+        <div className="pt-4 mt-2 border-t border-gray-100">
+          <p className="px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Dev Tools</p>
+          {devItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => onPageChange(item.id)}
+              className={`w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors ${
+                currentPage === item.id
+                  ? "bg-blue-50 text-blue-700 font-semibold"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       {/* Quick Stats */}

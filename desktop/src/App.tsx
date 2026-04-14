@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "./hooks/useDatabase";
-import { PipelineList, Dashboard, RunsPage, SyncPanel, BudgetPage } from "./components";
+import { PipelineList, Dashboard, RunsPage, SyncPanel, BudgetPage, DesignSystem } from "./components";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { ErrorBanner } from "./components/ErrorBanner";
 
-type Page = "dashboard" | "pipelines" | "runs" | "budgets" | "settings";
+type Page = "dashboard" | "pipelines" | "runs" | "budgets" | "settings" | "design-system";
 
 const App: React.FC = () => {
   const [appReady, setAppReady] = useState(false);
@@ -42,6 +42,7 @@ const App: React.FC = () => {
               {currentPage === "runs" && <RunsPage />}
               {currentPage === "budgets" && <BudgetPage />}
               {currentPage === "settings" && <SettingsPage />}
+              {currentPage === "design-system" && <DesignSystem />}
             </div>
           ) : (
             <div className="flex items-center justify-center h-full">
