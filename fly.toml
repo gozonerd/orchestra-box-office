@@ -9,6 +9,7 @@ primary_region = "ewr"
 [env]
   RUST_LOG = "orchestra_box_office_api=debug"
   DATABASE_URL = "postgresql://"
+  MACHINES_ENABLED = "true"
 
 [[services]]
   internal_port = 8080
@@ -30,9 +31,6 @@ primary_region = "ewr"
   [[services.ports]]
     port = 443
     handlers = ["tls", "http"]
-
-[env]
-  MACHINES_ENABLED = "true"
 
 [processes]
   app = "orchestra-box-office-api"
