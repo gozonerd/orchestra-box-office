@@ -22,6 +22,7 @@ mod models;
 mod routes;
 
 use crate::db::Database;
+use crate::middleware::require_auth;
 
 /// Application state containing database pool
 #[derive(Clone)]
@@ -48,13 +49,8 @@ async fn main() {
 
     let state = AppState { db };
 
-    // Build router
-    let app = Router::new()
-        // Health check
-        .route("/health", get(health_check))
-        // Auth routes
-        .route("/api/v1/auth/login", post(routes::auth::login))
-        .route("/api/v1/auth/status", get(routes::auth::check_auth))
+    // Protected routes — require valid Bearer token
+    let protected = Router::new()
         // Sync routes
         .route("/api/v1/sync/batch", post(routes::sync::batch_sync))
         .route(
@@ -71,6 +67,20 @@ async fn main() {
             "/api/v1/conflicts/resolve",
             post(routes::conflicts::resolve_conflict),
         )
+        .route_layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            require_auth,
+        ));
+
+    // Build router
+    let app = Router::new()
+        // Health check (public)
+        .route("/health", get(health_check))
+        // Auth routes (public)
+        .route("/api/v1/auth/login", post(routes::auth::login))
+        .route("/api/v1/auth/status", get(routes::auth::check_auth))
+        // Protected routes
+        .merge(protected)
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024)) // 10MB
         .layer(axum::middleware::from_fn(middleware::request_logging))
         .with_state(state);
@@ -92,7 +102,8 @@ async fn main() {
 async fn health_check() -> impl axum::response::IntoResponse {
     Json(json!({
         "status": "ok",
-        "timestamp": chrono::Utc::now().to_rfc3339()
+        "timestamp": chrono::Utc::now().to_rfc3339(),
+        "version": env!("CARGO_PKG_VERSION")
     }))
 }
 
