@@ -17,7 +17,7 @@ repo:
   type: "application"
 
   # One-sentence purpose statement. Claude reads this to orient.
-  purpose: "TODO — fill in purpose"
+  purpose: "Desktop app for ROI tracking, cost-per-business-outcome analysis and licence management; Tauri 2 + React with SQLCipher-encrypted local storage."
 
   # GitHub org or owner: Martinez-Methods | nerdykrystal
   org: "nerdykrystal"
