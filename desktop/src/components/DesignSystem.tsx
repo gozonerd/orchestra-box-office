@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { RefreshCw, ChevronDown, ChevronUp, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Circle as XCircle, Clock, Pause } from "lucide-react";
+// lucide-react is pinned at 0.294.0, which exports the pre-rename icon names
+// (AlertCircle / CheckCircle). The newer CircleAlert / CircleCheck names do not
+// exist in this version and fail the production build.
+import { RefreshCw, ChevronDown, ChevronUp, AlertCircle, CheckCircle, Circle as XCircle, Clock, Pause } from "lucide-react";
 
 // ── Sample data (no Tauri IPC required) ─────────────────────────────────────
 

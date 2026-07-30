@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Orchestra Box Office</title>
+  <!--
+    Orchestra Box Office app mark.
+    Same family as the Orchestra mark: the Empowered Teams & Systems brand
+    chevron (gold -> teal -> magenta) on deep navy, drawn as strokes per the
+    brand-mark rule ("reserve the full sweep for thin rules, edges, and the
+    mark - never large fills").
+    Where Orchestra puts pipeline nodes on the peak, Box Office puts an
+    ascending bar series beneath it - the ROI / cost-per-outcome domain.
+    Palette from the design system's colour tokens.
+  -->
+  <defs>
+    <linearGradient id="sweep" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#B2559E"/>
+      <stop offset="52%"  stop-color="#2FA4C4"/>
+      <stop offset="100%" stop-color="#F7CB4C"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="#0E1522"/>
+  <rect x="3" y="3" width="506" height="506" rx="109.5" ry="109.5"
+        fill="none" stroke="url(#sweep)" stroke-width="6" opacity="0.55"/>
+
+  <!-- the brand peak, held high and thin so the bars read as the subject -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 150 214 L 256 128 L 362 214" stroke="#B2559E" stroke-width="20"/>
+    <path d="M 116 208 L 256 94  L 396 208" stroke="#2FA4C4" stroke-width="20"/>
+    <path d="M  82 202 L 256 60  L 430 202" stroke="#F7CB4C" stroke-width="20"/>
+  </g>
+
+  <!-- ascending series: return climbing against cost -->
+  <g stroke-linecap="round">
+    <line x1="140" y1="410" x2="140" y2="336" stroke="#B2559E" stroke-width="42"/>
+    <line x1="256" y1="410" x2="256" y2="300" stroke="#2FA4C4" stroke-width="42"/>
+    <line x1="372" y1="410" x2="372" y2="264" stroke="#F7CB4C" stroke-width="42"/>
+  </g>
+
+  <!-- baseline -->
+  <line x1="96" y1="440" x2="416" y2="440" stroke="#FFFFFF" stroke-width="10"
+        stroke-linecap="round" opacity="0.5"/>
+</svg>
