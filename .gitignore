@@ -48,3 +48,4 @@ pytest_cache/
 .env.local
 *.key
 *.pem
+release/
